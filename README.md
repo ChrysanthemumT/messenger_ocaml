@@ -1,1 +1,2 @@
-# messager_ocaml
+# messenger_ocaml
+client - server using lwt
