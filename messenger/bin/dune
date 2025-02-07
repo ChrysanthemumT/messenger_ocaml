@@ -1,0 +1,4 @@
+(executable
+ (public_name messenger)
+ (name main)
+ (libraries messenger))
