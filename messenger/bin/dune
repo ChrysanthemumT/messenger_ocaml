@@ -1,4 +1,5 @@
 (executable
  (public_name messenger)
  (name main)
- (libraries messenger))
+ (libraries messenger lwt lwt.unix)
+(preprocess (pps lwt_ppx)))

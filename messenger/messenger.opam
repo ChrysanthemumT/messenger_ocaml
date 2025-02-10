@@ -12,6 +12,8 @@ bug-reports: "https://github.com/username/reponame/issues"
 depends: [
   "dune" {>= "3.17"}
   "ocaml"
+  "lwt"
+  "lwt_ppx"
   "odoc" {with-doc}
 ]
 build: [
