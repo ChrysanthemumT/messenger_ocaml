@@ -47,12 +47,17 @@ module Chat_utils = struct
             acknowledge oc timestamp () >>= fun () -> receive_message ic oc)
     | None -> Lwt_io.printf "Connection closed\n" >>= fun () -> Lwt.return_unit
 
+  let close_connection ic oc =
+    Lwt.catch
+      (fun () -> Lwt_io.close ic >>= fun () -> Lwt_io.close oc)
+      (fun _ -> Lwt.return_unit)
+
   let handle_conn ic oc =
     Lwt.catch
       (fun () -> Lwt.join [ send_message oc (); receive_message ic oc ])
       (fun e ->
         Lwt_io.printf "Connection error: %s\n" (Printexc.to_string e)
-        >>= fun () -> Lwt.return_unit)
+        >>= fun () -> close_connection ic oc)
 end
 
 module Server = struct
@@ -115,11 +120,16 @@ end
 
 let () =
   let mode = Sys.argv.(1) in
-  Printf.printf "%s started\n%!" mode;
   match mode with
   | "server" ->
+      Printf.printf "%s started\n%!" mode;
       let sock = Server.socket ~port:8000 in
       let server = Server.start_server sock in
       Lwt_main.run (server ())
-  | "client" -> Lwt_main.run (Client.start_client Sys.argv.(2) 8000)
-  | _ -> Printf.printf "invalid"
+  | "client" ->
+      if Array.length Sys.argv < 3 then
+        Printf.printf "Usage: %s client <server_address>\n" Sys.argv.(0)
+      else (
+        Printf.printf "%s started\n%!" mode;
+        Lwt_main.run (Client.start_client Sys.argv.(2) 8000))
+  | _ -> Printf.printf "Invalid mode: use 'server' or 'client'\n"
