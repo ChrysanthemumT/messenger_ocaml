@@ -118,7 +118,15 @@ module Client = struct
         >>= fun () -> Lwt.return_unit)
 end
 
+let print_usage () =
+  Printf.printf "Usage:\n";
+  Printf.printf "  As server: %s server\n" Sys.argv.(0);
+  Printf.printf "  As client: %s client <server_address>\n" Sys.argv.(0)
+
 let () =
+  if Array.length Sys.argv < 2 then (
+    print_usage ();
+    exit 1);
   let mode = Sys.argv.(1) in
   match mode with
   | "server" ->
